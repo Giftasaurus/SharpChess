@@ -112,6 +112,14 @@ namespace SharpChess.Model
             this.Pieces.Add(new Piece(Piece.PieceNames.Pawn, this, 7, 1, Piece.PieceIdentifierCodes.WhitePawn8));
         }
 
+        /// <summary>
+        /// The set pieces at 960 starting positions.
+        /// </summary>
+        protected override void SetPiecesAtStartingPositions960()
+        {
+            throw new System.NotImplementedException();
+        }
+
         #endregion
     }
 }

@@ -368,6 +368,11 @@ namespace SharpChess.Model
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the game will startup in 960 mode.
+        /// </summary>
+        public static bool Is960 { get; set; }
+
+        /// <summary>
         ///   Gets the lowest material count for black or white.
         /// </summary>
         public static int LowestMaterialCount
@@ -1055,7 +1060,7 @@ namespace SharpChess.Model
         {
             if (fenString == string.Empty)
             {
-                fenString = Fen.GameStartPosition;
+                fenString = Is960 ? Fen.GameStartPosition960 : Fen.GameStartPosition;
             }
 
             Fen.Validate(fenString);

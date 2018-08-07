@@ -29,6 +29,7 @@ namespace SharpChess.Model
     #region Using
 
     using System;
+    using System.Linq;
     using System.Text;
 
     #endregion
@@ -42,6 +43,11 @@ namespace SharpChess.Model
         #region Public Properties
 
         /// <summary>
+        /// Random used for 960 Game Mode
+        /// </summary>
+        private static Random random = new Random();
+
+        /// <summary>
         ///   Gets GameStartPosition.
         /// </summary>
         public static string GameStartPosition
@@ -52,9 +58,62 @@ namespace SharpChess.Model
             }
         }
 
+        /// <summary>
+        /// Gets GameStartPosition960.
+        /// </summary>
+        public static string GameStartPosition960
+        {
+            get
+            {
+                string startPositions = "rnbqkbnr";
+                bool validStart = false;
+                while (!validStart)
+                {
+                    startPositions = ShuffleString(startPositions);
+                    validStart = Validate960StartPosition(startPositions);
+                }
+                StringBuilder fenString = new StringBuilder();
+                fenString.Append(startPositions);
+                fenString.Append("/pppppppp/8/8/8/8/PPPPPPPP/");
+                fenString.Append(startPositions.ToUpper());
+                fenString.Append(" w KQkq - 0 1");
+                return fenString.ToString();
+            }
+        }
+
         #endregion
 
         #region Public Methods
+
+        public static bool Validate960StartPosition(string startPositions)
+        {
+            if (startPositions == null || startPositions.Length != 8)
+            {
+                return false;
+            }
+            if (startPositions.Where(x => x == 'b').Count() != 2 ||
+                startPositions.Where(x => x == 'r').Count() != 2 ||
+                startPositions.Where(x => x == 'n').Count() != 2 ||
+                startPositions.Where(x => x == 'q').Count() != 1 ||
+                startPositions.Where(x => x == 'k').Count() != 1)
+            {
+                return false;
+            }            
+            int bishop1 = startPositions.IndexOf('b');
+            int bishop2 = startPositions.LastIndexOf('b');
+            if ((bishop2 - bishop1) % 2 != 1)
+            {
+                return false;
+            }
+            int rook1 = startPositions.IndexOf('r');
+            int rook2 = startPositions.LastIndexOf('r');
+            int king = startPositions.IndexOf('k');
+            if (!(rook1 < king && rook2 > king))
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         /// Extraction the current position in FEN: Forsyth-Edwards Notation
@@ -817,8 +876,8 @@ namespace SharpChess.Model
             {
                 return " " + Game.MoveHistory.Last.From.FileName
                        + ((Game.MoveHistory.Last.Piece.Player.Colour == Player.PlayerColourNames.White) ? "3 " : "6 ");
-                    
-                    // The case between From and To
+
+                // The case between From and To
             }
 
             return " - "; // There is not en passant target square
@@ -1014,6 +1073,26 @@ namespace SharpChess.Model
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Shuffles a string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private static string ShuffleString(string str)
+        {
+            char[] array = str.ToCharArray();
+            int n = array.Length;
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                var value = array[k];
+                array[k] = array[n];
+                array[n] = value;
+            }
+            return new string(array);
         }
 
         /// <summary>
